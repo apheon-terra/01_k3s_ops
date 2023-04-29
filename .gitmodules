@@ -1,0 +1,3 @@
+[submodule "02_tf_proxmox"]
+	path = 02_tf_proxmox
+	url = git@github.com:apheon-terra/02_tf_proxmox.git
