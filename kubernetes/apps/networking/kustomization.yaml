@@ -4,11 +4,9 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
 #  from template
-  - ./cloudflare/ks.yaml
+  - ./cloudflared/ks.yaml
   - ./echo-server/ks.yaml
   - ./external-dns/ks.yaml
   - ./ingress-nginx/ks.yaml
   - ./k8s-gateway/ks.yaml
-  - ./multus/ks.yaml
-# from template
   - ./multus/ks.yaml
