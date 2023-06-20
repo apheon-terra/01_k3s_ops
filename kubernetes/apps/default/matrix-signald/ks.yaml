@@ -3,14 +3,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: cluster-apps-matrix-signal
+  name: cluster-apps-matrix-signald
   namespace: flux-system
 spec:
   dependsOn:
   # - name: cluster-apps-external-secrets-stores
   # - name: cluster-apps-rook-ceph-cluster
   # - name: cluster-apps-volsync
-  path: ./kubernetes/apps/default/matrix-signal/app
+  path: ./kubernetes/apps/default/matrix-signald/app
   prune: true
   sourceRef:
     kind: GitRepository
@@ -18,7 +18,7 @@ spec:
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1
       kind: HelmRelease
-      name: matrix-signal
+      name: matrix-signald
       namespace: default
   interval: 30m
   retryInterval: 1m
