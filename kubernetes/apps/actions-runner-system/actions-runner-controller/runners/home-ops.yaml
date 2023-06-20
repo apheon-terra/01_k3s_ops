@@ -3,7 +3,7 @@
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: RunnerDeployment
 metadata:
-  name: home-ops
+  name: homelab
   namespace: actions-runner-system
 spec:
   template:
@@ -26,11 +26,11 @@ spec:
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
 metadata:
-  name: home-ops
+  name: homelab
   namespace: actions-runner-system
 spec:
   scaleTargetRef:
-    name: home-ops
+    name: homelab
   scaleUpTriggers:
     - githubEvent:
         workflowJob: {}
