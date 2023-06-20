@@ -26,7 +26,7 @@ resources:
   - ./letsblockit/ks.yaml
   - ./libreddit/ks.yaml
   - ./lidarr/ks.yaml
-  - ./lldapp/ks.yaml
+  - ./lldap/ks.yaml
   - ./mastodon/ks.yaml
   - ./matrix-coturn/ks.yaml
   - ./matrix-element/ks.yaml
