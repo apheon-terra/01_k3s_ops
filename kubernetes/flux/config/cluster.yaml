@@ -28,7 +28,7 @@ spec:
   wait: false
   sourceRef:
     kind: GitRepository
-    name: 01_k3s_ops
+    name: homelab
   decryption:
     provider: sops
     secretRef:
