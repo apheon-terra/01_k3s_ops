@@ -1,0 +1,49 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: apply-ingress-auth-annotations
+  annotations:
+    policies.kyverno.io/title: Update ingress annotations
+    policies.kyverno.io/subject: Ingress
+    policies.kyverno.io/description: >-
+      This policy creates auth annotations on ingresses. When
+      the `auth.home.arpa/enabled` annotation is `true` it
+      applies the nginx auth annotations for use with Authelia/Oauth2-proxy
+spec:
+  mutateExistingOnPolicyUpdate: true
+  generateExistingOnPolicyUpdate: true
+  rules:
+    - name: auth
+      match:
+        any:
+          - resources:
+              kinds: [Ingress]
+              annotations:
+                auth.home.arpa/enabled: 'true'
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+            #oauth2-proxy
+              +(nginx.ingress.kubernetes.io/auth-url): https://auth.alpheon.uk/oauth2/auth?allowed_groups=admins
+              +(nginx.ingress.kubernetes.io/auth-signin): https://auth.alpheon.uk/oauth2/start?rd=$scheme://$best_http_host$request_uri
+              +(nginx.ingress.kubernetes.io/auth-response-headers): x-auth-request-email, x-auth-request-groups
+
+    #from onedr0p from one of the pods using authelia
+              # +nginx.ingress.kubernetes.io/auth-method: GET
+              # +nginx.ingress.kubernetes.io/auth-url: http://authelia.default.svc.cluster.local/api/verify
+              # +nginx.ingress.kubernetes.io/auth-signin: https://auth.devbu.io?rm=$request_method
+              # +nginx.ingress.kubernetes.io/auth-response-headers: Remote-User,Remote-Name,Remote-Groups,Remote-Email
+              # +nginx.ingress.kubernetes.io/auth-snippet: proxy_set_header X-Forwarded-Method $request_method;
+
+    # from carpenike from a deprecated policy that used authelia
+              # +(nginx.ingress.kubernetes.io/auth-method): GET
+              # +(nginx.ingress.kubernetes.io/auth-url): |-
+              #   http://authelia.security.svc.cluster.local:9091/api/verify
+              # +(nginx.ingress.kubernetes.io/auth-signin): |-
+              #   https://auth.${SECRET_DOMAIN}?rm=$request_method
+              # +(nginx.ingress.kubernetes.io/auth-response-headers): |-
+              #   Remote-User,Remote-Name,Remote-Groups,Remote-Email
+              # +(nginx.ingress.kubernetes.io/auth-snippet): |
+              #   proxy_set_header X-Forwarded-Method $request_method;

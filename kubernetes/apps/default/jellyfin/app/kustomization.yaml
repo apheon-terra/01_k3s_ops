@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+resources:
+# - ./externalsecret.yaml
+  - ./config-pvc.yaml
+  - ./secret.sops.yaml
+  - ./helmrelease.yaml
+  - ./volsync.yaml
+  - ./net-attach.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: jellyfin
+      app.kubernetes.io/instance: jellyfin

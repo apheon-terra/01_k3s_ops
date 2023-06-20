@@ -1,0 +1,50 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ${SECRET_PUBLIC_DOMAIN/./-}-production
+  namespace: networking
+spec:
+  secretName: ${SECRET_PUBLIC_DOMAIN/./-}-production-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: ${SECRET_PUBLIC_DOMAIN}
+  dnsNames:
+    - ${SECRET_PUBLIC_DOMAIN}
+    - '*.${SECRET_PUBLIC_DOMAIN}'
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ${SECRET_PUBLIC_DOMAIN/./-}-staging
+  namespace: networking
+spec:
+  secretName: ${SECRET_PUBLIC_DOMAIN/./-}-staging-tls
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: ${SECRET_PUBLIC_DOMAIN}
+  dnsNames:
+    - ${SECRET_PUBLIC_DOMAIN}
+    - '*.${SECRET_PUBLIC_DOMAIN}'
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ${SECRET_PUBLIC_DOMAIN/./-}
+  namespace: networking
+spec:
+  secretName: ${SECRET_PUBLIC_DOMAIN/./-}-tls
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: ${SECRET_PUBLIC_DOMAIN}
+  dnsNames:
+    - ${SECRET_PUBLIC_DOMAIN}
+    - '*.${SECRET_PUBLIC_DOMAIN}'
+
+
+# It performs a substitution operation using the pattern /./-.
+# This replaces the first dot character (.) found in the value of SECRET_PUBLIC_DOMAIN with a hyphen (-).
+# It appends the string -staging to the modified value.

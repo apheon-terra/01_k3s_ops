@@ -1,0 +1,148 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: jellyfin
+  namespace: default
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.3.2
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controller:
+      type: statefulset
+    image:
+      repository: ghcr.io/onedr0p/jellyfin
+      tag: 10.8.9@sha256:01a6497a1290b73f63251aebe6d01327c15b3413c3e1013c2a396ffe116ced4d
+    env:
+      TZ: Etc/UTC
+      JELLYFIN_CACHE_DIR: /config/cache
+      DOTNET_SYSTEM_IO_DISABLEFILELOCKING: 'true'
+    service:
+      main:
+        type: LoadBalancer
+        externalIPs: [192.168.69.105]
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            port: &port 8096
+    # serviceMonitor:
+    #   main:
+    #     enabled: true
+    probes:
+      liveness: &probes
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /health
+            port: *port
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+      readiness: *probes
+      startup:
+        enabled: false
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          hajimari.io/icon: simple-icons:jellyfin
+        hosts:
+          - host: &host '{{ .Release.Name }}.${SECRET_PUBLIC_DOMAIN}'
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups: [44, 109, 10000]
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        storageClass: ceph-block
+    persistence:
+      media:
+        enabled: true
+        type: nfs
+        server: expanse.${SECRET_DOMAIN}
+        path: /eros/Media
+        mountPath: /media
+        readOnly: true
+      transcode:
+        enabled: true
+        type: emptyDir
+        # config:
+        #   enabled: true
+        #   existingClaim: jellyfin-config-0
+        # media:
+        #   enabled: true
+        #   existingClaim: media-nfs
+        #   mountPath: /media
+        # media-canfail:
+        #   enabled: true
+        #   existingClaim: media-nfs-canfail
+        #   mountPath: /media-canfail
+        # media-cephfs:
+        #   enabled: true
+        #   existingClaim: media-cephfs
+        #   mountPath: /media-cephfs
+    nodeSelector:
+      node-role.kubernetes.io/worker: 'true'
+      intel.feature.node.kubernetes.io/gpu: 'true'
+    resources:
+      requests:
+        gpu.intel.com/i915: 1
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 2000Mi
+    dnsConfig:
+      options:
+        - name: ndots
+          value: '1'
+    podAnnotations:
+      k8s.v1.cni.cncf.io/networks: jellyfin-wifi-static
+
+# The ndots option determines the number of dots that must be present in a domain name before the resolver
+# considers it to be a fully qualified domain name (FQDN). Setting it to "1" means that a domain name with a
+# single dot, such as example.com, is considered an FQDN, while a domain name without any dots, such as
+
+# localhost, is considered a relative name and will be resolved using the search domains.
+
+
+# By setting ndots to "1", the DNS resolver behavior is modified to treat domain names with a single dot as
+# fully qualified, which can affect how DNS queries are performed within the Pod. This configuration is useful
+
+# in scenarios where you want to ensure that domain names without any dots are not automatically appended with
+# search domains during DNS resolution.

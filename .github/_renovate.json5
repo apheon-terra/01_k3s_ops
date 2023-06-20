@@ -1,0 +1,215 @@
+// {
+//   "extends": [
+//     ":enableRenovate",
+//     "config:base",
+//     ":disableRateLimiting",
+//     ":dependencyDashboard",
+//     ":semanticCommits",
+//     ":separatePatchReleases",
+//     "docker:enableMajor",
+//     ":enablePreCommit",
+//     "github>0dragosh/homelab//.github/renovate/autoMerge.json5",
+//     "github>0dragosh/homelab//.github/renovate/labels.json5",
+//     "github>0dragosh/homelab//.github/renovate/semanticCommits.json5",
+//     "github>0dragosh/homelab//.github/renovate/disabledDatasources.json5"
+//   ],
+//   "enabled": true,
+//   "timezone": "Europe/Bucharest",
+//   "semanticCommits": "enabled",
+//   "dependencyDashboard": true,
+//   "dependencyDashboardTitle": "Renovate Dashboard",
+//   "commitBody": "Signed-off-by: Dragosh <39906742+0dragosh@users.noreply.github.com>",
+//   // do not notify on closed unmerged PRs
+//   "suppressNotifications": ["prIgnoreNotification"],
+//   // only rebase PRs when there's a conflict
+//   "rebaseWhen": "conflicted",
+//   "ignoreDeps": [
+//     "ghcr.io/fluxcd/helm-controller",
+//     "ghcr.io/fluxcd/image-automation-controller",
+//     "ghcr.io/fluxcd/image-reflector-controller",
+//     "ghcr.io/fluxcd/kustomize-controller",
+//     "ghcr.io/fluxcd/notification-controller",
+//     "ghcr.io/fluxcd/source-controller"
+//   ],
+//   "flux": {
+//     "fileMatch": [
+//       "k8s/.+\\.ya?ml$"
+//     ]
+//   },
+//   "helm-values": {
+//     "fileMatch": [
+//       "k8s/.+/helm-release\\.yaml$",
+//     ],
+//   },
+//   "helmv3": {
+//     "fileMatch": [
+//       "charts/.+/Chart\\.ya?ml$"
+//     ]
+//   },
+//   "kubernetes": {
+//     "fileMatch": [
+//       "k8s/.+\\.yaml$",
+//     ],
+// //    "ignorePaths": [
+// //      "k8s//.+/flux",
+// //    ],
+//   },
+//   "regexManagers": [
+//     // regexManager to read and process HelmRelease files
+//     {
+//       "fileMatch": [
+//         "k8s/.+\\.yaml$"
+//       ],
+//       "matchStrings": [
+//         // helm releases
+//         "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n",
+//       ],
+//       "datasourceTemplate": "helm"
+//     },
+//     // regexManager to read and process cert-manager CRD's
+//     {
+//       "fileMatch": [
+//         "k8s/.+/crds/cert-manager/.+\\.yaml$"
+//       ],
+//       "matchStrings": [
+//         "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n.*\\/(?<currentValue>.*?)\\/",
+//       ],
+//       "datasourceTemplate": "helm"
+//     },
+//     // regexManager to read and process kube-prometheus-stack CRD's
+//     {
+//       "fileMatch": [
+//         "k8s/.+/crds/kube-prometheus-stack/.+\\.yaml$",
+//         "k8s/.+/crds/velero/.+\\.yaml$"
+//       ],
+//       "matchStrings": [
+//         "registryUrl=(?<registryUrl>.*?)\n *tag: (?<depName>[a-zA-Z-]+)-(?<currentValue>.*)\n",
+//       ],
+//       "datasourceTemplate": "helm"
+//     },
+//     // regexManager to read and process Traefik CRD's
+//     {
+//       "fileMatch": [
+//         "k8s/.+/crds/traefik/.+\\.yaml$"
+//       ],
+//       "matchStrings": [
+//         "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n *tag: v(?<currentValue>.*)\n",
+//       ],
+//       "datasourceTemplate": "helm"
+//     },
+//     // regexManager to read and process Rook-Ceph CRD's
+//     {
+//       "fileMatch": [
+//         "k8s/.+/crds/rook-ceph/.+\\.yaml$"
+//       ],
+//       "matchStrings": [
+//         "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n *tag: (?<currentValue>.*)\n"
+//       ],
+//       "datasourceTemplate": "helm"
+//     },
+//     {
+//       "fileMatch": [
+//         "k8s/.+/crds/external-snapshotter/.+\\.yaml$",
+//         "k8s/.+/crds/external-dns/.+\\.yaml$"
+//       ],
+//       "matchStrings": [
+//         "url: https:\/\/github\\.com\/(?<depName>.*?)\\.git\n *ref:\n *tag: (?<currentValue>.*)\n"
+//       ],
+//       "datasourceTemplate": "github-releases"
+//     }
+//   ],
+//   "packageRules": [
+//     {
+//       "matchDatasources": ["helm"],
+//       "semanticCommitScope": "charts",
+//       "separateMinorPatch": true,
+//       "ignoreDeprecated": true
+//     },
+//     {
+//       "matchDatasources": ["docker"],
+//       "enabled": true,
+//       "matchUpdateTypes": ["major", "minor", "patch"]
+//     },
+//     {
+//       "matchDatasources": ["docker"],
+//       "semanticCommitScope": "images",
+//       "separateMinorPatch": true
+//     },
+//     // add labels according to package and update types
+//     {
+//       "matchDatasources": ["docker"],
+//       "matchUpdateTypes": ["major"],
+//       "commitMessagePrefix": "feat(images)!: ",
+//       "labels": ["renovate/image", "dep/major"]
+//     },
+//     {
+//       "matchDatasources": ["docker"],
+//       "matchUpdateTypes": ["minor"],
+//       "semanticCommitType": "feat",
+//       "labels": ["renovate/image", "dep/minor"]
+//     },
+//     {
+//       "matchDatasources": ["docker"],
+//       "matchUpdateTypes": ["patch"],
+//       "semanticCommitType": "fix",
+//       "labels": ["renovate/image", "dep/patch"]
+//     },
+//     {
+//       "matchDatasources": ["helm"],
+//       "matchUpdateTypes": ["major"],
+//       "commitMessagePrefix": "feat(charts)!: ",
+//       "labels": ["renovate/helm", "dep/major"]
+//     },
+//     {
+//       "matchDatasources": ["helm"],
+//       "matchUpdateTypes": ["minor"],
+//       "semanticCommitType": "feat",
+//       "labels": ["renovate/helm", "dep/minor"]
+//     },
+//     {
+//       "matchDatasources": ["helm"],
+//       "matchUpdateTypes": ["patch"],
+//       "semanticCommitType": "fix",
+//       "labels": ["renovate/helm", "dep/patch"]
+//     },
+//     {
+//       "matchDatasources": ["docker"],
+//       "versioning": "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z(-(?<compatibility>.*))?$",
+//       "matchPackageNames": ["quay.io/minio/minio"]
+//     },
+//     // version strategies
+//     {
+//       "matchDatasources": ["docker"],
+//       "versioning": "loose",
+//       "matchPackageNames": [
+//         "ghcr.io/onedr0p/plex",
+//         "ghcr.io/onedr0p/qbittorrent"
+//       ]
+//     },
+//     // group packages
+//     {
+//       "matchDatasources": ["helm", "docker"],
+//       "matchPackagePatterns": ["^rook.ceph"],
+//       "groupName": "rook-ceph-suite",
+//       "additionalBranchPrefix": "",
+//       "separateMinorPatch": true
+//     },
+//     {
+//       "matchDatasources": ["github-releases", "docker"],
+//       "matchPackagePatterns": [
+//         "external-snapshotter",
+//         "snapshot-controller"
+//       ],
+//       "groupName": "external-snapshotter-suite",
+//       "additionalBranchPrefix": "",
+//       "separateMinorPatch": true
+//     },
+//     {
+//       "matchDatasources": ["github-tags", "docker"],
+//       "matchPackagePatterns": ["rancher/system-upgrade-controller"],
+//       "groupName": "system-upgrade-controller-suite",
+//       "additionalBranchPrefix": "",
+//       "separateMinorPatch": true
+//     }
+//   ],
+// }

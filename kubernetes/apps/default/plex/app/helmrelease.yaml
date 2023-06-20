@@ -1,0 +1,112 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: plex
+  namespace: default
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.3.2
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controller:
+      type: statefulset
+    image:
+      repository: ghcr.io/onedr0p/plex
+      tag: 1.31.3.6868-28fc46b27@sha256:9bc113df99bb8255aa77e79be66d7558092d361592f9934299e1353bfacb32f4
+    env:
+      TZ: Etc/UTC
+    service:
+      main:
+        ports:
+          http:
+            port: 32400
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress.${SECRET_PUBLIC_DOMAIN}
+          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+          hajimari.io/icon: mdi:plex
+        hosts:
+          - host: &host '{{ .Release.Name }}.${SECRET_PUBLIC_DOMAIN}'
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups: [44, 109, 10000]
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        storageClass: ceph-block
+    persistence:
+      media:
+        enabled: true
+        type: nfs
+        server: expanse.${SECRET_PUBLIC_DOMAIN}
+        path: /eros/Media
+        mountPath: /media
+        readOnly: true
+      transcode:
+        enabled: true
+        type: emptyDir
+    nodeSelector:
+      node-role.kubernetes.io/worker: 'true'
+      intel.feature.node.kubernetes.io/gpu: 'true'
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values: [frigate]
+            topologyKey: kubernetes.io/hostname
+    resources:
+      requests:
+        gpu.intel.com/i915: 1
+        cpu: 100m
+        memory: 200Mi
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 2000Mi
+    sidecars:
+      auto-languages:
+        image: docker.io/remirigal/plex-auto-languages:v1.2.1
+        imagePullPolicy: IfNotPresent
+        env:
+          - {name: PLEX_URL, value: http://localhost:32400}
+          - {name: REFRESH_LIBRARY_ON_SCAN, value: 'false'}
+        envFrom:
+          - secretRef:
+              name: plex-auto-languages-secret
+        volumeMounts:
+          - {name: local, mountPath: /.local}

@@ -1,0 +1,63 @@
+---
+# (string) Timezone for the servers
+# timezone: "America/New_York"
+
+# (list) Additional ssh public keys to add to the nodes
+# ssh_authorized_keys:
+timezone: Etc/UTC
+public_ssh_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIQvpNskUO0Zy8kzwzuQrErLqEnkJkMMJ9sLD4MBcxWl 1autoWork apheon-arco-10-11-2022 local-passphrase-less
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL8HmDq8XAhfKLyZnw6UWY4JmHfIhzJkoBUX3/JviXkn apheon@L2-1-ansible-debops
+# packages_repositories:
+# - ppa:fish-shell/release-3
+packages_install:
+  - apt-transport-https
+  - arptables
+  - ca-certificates
+  - curl
+  - ebtables
+# - fish
+  - zsh
+  - fzf
+  - gdisk
+  - hdparm
+  - htop
+  - iputils-ping
+  - ipvsadm
+  - lm-sensors
+  - lvm2
+  - nano
+  - net-tools
+  - nfs-common
+  - ntpdate
+  - nvme-cli
+  - open-iscsi
+  - psmisc
+  - python3-kubernetes
+  - python3-yaml
+  - smartmontools
+  - socat
+  - software-properties-common
+  - unzip
+  - git
+packages_remove:
+  - apparmor
+  - ufw
+  - unattended-upgrades
+
+# # -- garden
+# garden_become: true
+# garden_install_packages:
+# - unattended-upgrades
+# - net-tools
+# - trash-cli
+# - nfs-common
+# - vim
+# garden_remove_packages:
+# - snapd
+
+# # -- ssh hardening
+# ssh_server_password_login: false
+# ssh_permit_root_login: "no"
+# sftp_enabled: true
+# ssh_x11_forwarding: true

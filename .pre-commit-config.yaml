@@ -1,0 +1,65 @@
+---
+fail_fast: false
+repos:
+  # - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+  #   rev: 0.2.3   # or other specific tag
+  #   hooks:
+  #     - id: yamlfmt
+  #       args: [--mapping, '2', --sequence, '4', --offset, '2']
+        # log_file: pre-commit_yamlfmt_log
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.29.0
+    hooks:
+      - args:
+          - --config-file
+          - .github/lint/.yamllint.yaml
+        id: yamllint
+        # log_file: pre-commit_yyamllint_log
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.4.2
+    hooks:
+      - id: remove-crlf
+      - id: remove-tabs
+  - repo: https://github.com/sirosen/texthooks
+    rev: 0.5.0
+    hooks:
+      - id: fix-smartquotes
+  - repo: https://github.com/k8s-at-home/sops-pre-commit
+    rev: v2.1.1
+    hooks:
+      - id: forbid-secrets
+        exclude: |
+          (?x)^(
+            kubernetes\/apps\/monitoring\/kubernetes-dashboard\/app\/rbac.yaml|
+            kubernetes\/apps\/monitoring\/gatus\/app\/rbac.yaml
+            )
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.16.1
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.19
+    hooks:
+      - id: helmlint
+      - id: shellcheck
+      - id: terraform-fmt
+
+
+# - repo: local
+#   hooks:
+#     - id: my-custom-hook
+#       name: Custom Hook
+#       entry: scripts/my_hook.sh
+#       stages: [commit]
+#  $tmpl\/.*.sops\.ya?ml

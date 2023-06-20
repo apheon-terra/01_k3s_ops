@@ -1,0 +1,9 @@
+---
+nameReference:
+  - kind: ConfigMap
+    version: v1
+    fieldSpecs:
+      - path: spec/values/persistence/config/name
+        kind: HelmRelease
+# the following config is for teaching kustomize where to look at when substituting vars.
+# This file is for teaching kustomize how to substitute name and namespace reference in CRD

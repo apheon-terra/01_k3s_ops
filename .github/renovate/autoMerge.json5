@@ -1,0 +1,73 @@
+{
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "docker",
+        "github-tags"
+      ],
+      "automerge": false,
+      "automergeType": "pr",
+      "requiredStatusChecks": null,
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "stabilityDays": 3,
+      "matchPackageNames": [
+        "ghcr.io/onedr0p/prowlarr-nightly",
+        "ghcr.io/onedr0p/prowlarr",
+        "ghcr.io/onedr0p/radarr",
+        "ghcr.io/onedr0p/sonarr",
+        "ghcr.io/onedr0p/readarr",
+        "ghcr.io/onedr0p/tautulli",
+        "ghcr.io/onedr0p/prowlarr",
+        "ghcr.io/onedr0p/sonarr-develop",
+        "ghcr.io/onedr0p/radarr-develop",
+        "ghcr.io/bjw-s/calibre-web",
+        "ghcr.io/bjw-s/tautulli",
+        "ghcr.io/onedr0p/readarr",
+        "ghcr.io/onedr0p/readarr-nightly",
+        "ghcr.io/onedr0p/prowlarr",
+        "ghcr.io/taxel/plextraktsync",
+        "renovatebot/github-action",
+        "radarr",
+        "readarr",
+        "sonarr",
+        "prowlarr",
+        "calibre",
+        "calibre-web",
+        "kubernetes-sigs/external-dns",
+        "zigbee2mqtt",
+        "unifi-poller",
+        "tautulli",
+        "speedtest-exporter",
+        "sabnzbd",
+        "qbittorrent",
+        "node-red",
+        "node-red",
+        "mosquitto",
+        "kah-common-chart",
+        "app-template",
+        "jellyfin",
+        "intel-gpu-plugin"
+      ]
+    },
+    {
+      "matchDatasources": ["helm"],
+      "automerge": false,
+      "automergeType": "branch",
+      "requiredStatusChecks": null,
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "kube-prometheus-stack",
+        "traefik",
+        "external-dns",
+        "grafana",
+        "velero",
+        "kured",
+        "nri-bundle",
+        "loki"
+      ]
+    }
+  ]
+}

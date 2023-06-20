@@ -1,0 +1,12 @@
+# check config docs:
+# https://ansible-lint.readthedocs.io/en/latest/
+exclude_paths:
+- inventory/
+skip_list:
+- yaml[line-length]
+- var-naming
+warn_list:
+- command-instead-of-shell
+- deprecated-command-syntax
+- experimental
+- no-changed-when

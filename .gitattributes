@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.sops.* diff=sopsdiffer
+*.sops.toml linguist-language=JSON
+
+# from 0drag0sh
+secret.enc.yaml diff=sopsdiffer
+global-secrets.yaml diff=sopsdiffer
+*gitcryptsecret filter=git-crypt diff=git-crypt

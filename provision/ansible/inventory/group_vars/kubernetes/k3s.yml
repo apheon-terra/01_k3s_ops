@@ -1,0 +1,70 @@
+---
+#
+# Below vars are for the xanmanning.k3s role
+# ...see https://github.com/PyratLabs/ansible-role-k3s
+#
+# Calico configuration
+calico_bgp_peer_ip: 192.168.1.1 #192.168.1.1
+calico_bgp_as_number: 64512
+calico_bgp_external_ips: 192.168.69.0/24
+# k3s configuration
+# renovate: datasource=github-releases depName=k3s-io/k3s
+k3s_release_version: v1.27.1+k3s1
+
+# (bool) Install using hard links rather than symbolic links.
+k3s_install_hard_links: true
+
+# (bool) Escalate user privileges for all tasks
+k3s_become: true
+
+# (bool) Enable debug logging on the k3s service
+k3s_debug: false
+
+# (bool) Enable etcd embedded datastore
+k3s_etcd_datastore: true
+
+# (bool) Allow the use of unsupported configurations in k3s
+k3s_use_unsupported_config: true
+
+# (string) Control Plane registration address
+# k3s_registration_address: "{{ kubevip_address }}"
+k3s_registration_address: 192.168.1.1 #192.168.254.3
+# (list) A list of URLs to deploy on the primary control plane. Read notes below.
+k3s_server_manifests_urls:
+# Kube-vip
+# - url: https://raw.githubusercontent.com/kube-vip/kube-vip/main/docs/manifests/rbac.yaml
+#   filename: kube-vip-rbac.yaml
+# Tigera Operator
+  - url: https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
+    filename: custom-calico-tigera-operator.yaml
+  # Prometheus Operator
+
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
+    filename: custom-prometheus-alertmanagerconfigs.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
+    filename: custom-prometheus-alertmanagers.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+    filename: custom-prometheus-podmonitors.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml
+    filename: custom-prometheus-probes.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
+    filename: custom-prometheus-prometheuses.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
+    filename: custom-prometheus-prometheusrules.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+    filename: custom-prometheus-servicemonitors.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
+    filename: custom-prometheus-thanosrulers.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_scrapeconfigs.yaml
+    filename: custom-prometheus-scrapeconfigs.yaml
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheusagents.yaml
+    filename: custom-prometheus-prometheusagents.yaml
+
+# (list) A flat list of templates to deploy on the primary control plane
+# /var/lib/rancher/k3s/server/manifests
+k3s_server_manifests_templates:
+# - calico-installation.yaml.j2
+# - kube-vip-daemonset.yaml.j2
+  - custom-calico-installation.yaml.j2
+  - custom-calico-bgpconfiguration.yaml.j2
+  - custom-calico-bgppeer.yaml.j2

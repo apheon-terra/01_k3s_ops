@@ -1,0 +1,75 @@
+---
+creation_rules:
+# cluster secrets
+  - age: age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+    path_regex: .*\.sops\.(yml|yaml)$
+
+  - path_regex: kubernetes/.*\.sops\.ya?ml
+    encrypted_regex: ^(data|stringData)$
+    key_groups:
+      - age:
+          - age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+  - path_regex: kubernetes/.*\.sops\.ini
+    key_groups:
+      - age:
+          - age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+  - path_regex: kubernetes/.*\.sops\.toml
+    key_groups:
+      - age:
+          - age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+  - path_regex: kubernetes/.*\.sops\.json
+    key_groups:
+      - age:
+          - age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+
+# will match any file that is nested inside a "kubernetes" folder and
+#  has a filename that ends with ".sops.yml" or ".sops.yaml". It will work regardless of the level of nesting
+
+# provision secrets
+  - pgp: EBBF39679C6F45931641675C60884A69AEC68127
+    path_regex: provision/ansible/inventory/.*\.sops\.(yml|yaml)$
+    encrypted_regex: (^secret|password)
+
+  - pgp: EBBF39679C6F45931641675C60884A69AEC68127
+    path_regex: provision/proxmox/.*secret\.(yml|yaml)$
+    encrypted_regex: (^secret|password)
+
+  - path_regex: provision/cloudflare/.*secret\.(yml|yaml)$
+    key_groups:
+      - age:
+          - age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+    encrypted_regex: (^data$|^stringData$|user|[Pp]assword|userDatabase)
+
+  - age: age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+    path_regex: .*\.sops\.(yml|yaml)$
+
+#old revision
+# cluster secrets
+# - pgp: EBBF39679C6F45931641675C60884A69AEC68127
+#   path_regex: cluster/.*secret\.(yml|yaml)$
+#   encrypted_regex: (^data$|^stringData$|user|[Pp]assword|userDatabase)
+
+# # provision secrets
+# - pgp: EBBF39679C6F45931641675C60884A69AEC68127
+#   path_regex: ansible/inventory/.*\.sops\.(yml|yaml)$
+#   encrypted_regex: (^secret|password)
+
+
+# - age: age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+#   path_regex: terraform/.*\.sops\.(yml|yaml)$
+
+# ---
+# creation_rules:
+#   - path_regex: kubernetes/.*\.sops\.ya?ml
+#     encrypted_regex: "^(data|stringData)$"
+#     key_groups:
+#       - age:
+#           - age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+#   - path_regex: ansible/.*\.sops\.ya?ml
+#     key_groups:
+#       - age:
+#           - age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs
+#   - path_regex: terraform/.*\.sops\.ya?ml
+#     key_groups:
+#       - age:
+#           - age1k4ynyg53h5a7x5urs6j38w544z0qqdwffl9j87h7mnr6vywgwfxq9e7njs

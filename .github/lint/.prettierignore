@@ -1,0 +1,6 @@
+.private
+.vscode
+*.sops.*
+ansible/roles/xanmanning.k3s/
+ansible/roles/mrlesmithjr.zfs/
+gotk-components.yaml
