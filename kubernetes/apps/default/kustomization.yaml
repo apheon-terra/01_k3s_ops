@@ -45,8 +45,8 @@ resources:
   - ./n8n/ks.yaml
   - ./navidrome/ks.yaml
   - ./nextcloud/ks.yaml
-  - ./oauth-proxy/ks.yaml
-  - ./oauth-proxy-redis/ks.yaml
+  - ./oauth2-proxy/ks.yaml
+  - ./oauth2-proxy-redis/ks.yaml
   - ./obsidian-sync/ks.yaml
   - ./overseerr/ks.yaml
   - ./paperless/ks.yaml
