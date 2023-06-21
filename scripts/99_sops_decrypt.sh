@@ -65,3 +65,5 @@ sops --decrypt --in-place "${PROJECT_DIR}/kubernetes/apps/flux-system/addons/not
 sops --decrypt --in-place "${PROJECT_DIR}/kubernetes/apps/flux-system/addons/notifications/discord/secret.sops.yaml"
 sops --decrypt --in-place "${PROJECT_DIR}/kubernetes/flux/vars/cluster-secrets.sops.yaml"
 sops --decrypt --in-place "${PROJECT_DIR}/kubernetes/flux/vars/cluster-settings.yaml"
+sops --decrypt --in-place "${PROJECT_DIR}/kubernetes/apps/flux-system/weave-gitops/app/secret.sops.yaml"
+sops --decrypt --in-place "${PROJECT_DIR}/kubernetes/apps/flux-system/addons/webhooks/github/secret.sops.yaml"
