@@ -4,7 +4,7 @@ apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
 metadata:
   name: readarr
-  namespace: media
+  namespace: default
 spec:
   sourcePVC: readarr-config-0
   trigger:
