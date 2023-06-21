@@ -6,4 +6,4 @@ resources:
 # - config-pvc.yaml
   - secret.sops.yaml
 # - gitea-ceph-object-bucket.yaml
-  - helm-release.yaml
+  - helmrelease.yaml

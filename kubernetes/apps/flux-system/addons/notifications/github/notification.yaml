@@ -7,7 +7,7 @@ metadata:
   namespace: flux-system
 spec:
   type: github
-  address: ttps://github.com/apheon-terra/01_k3s_ops
+  address: https://github.com/apheon-terra/01_k3s_ops
   interval: 10m
   secretRef:
     name: github-token-secret
