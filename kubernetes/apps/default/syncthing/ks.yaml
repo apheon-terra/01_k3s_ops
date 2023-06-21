@@ -7,8 +7,8 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: cluster-workloads-rook-ceph-cluster
-    - name: cluster-workloads-volsync
+    - name: cluster-apps-rook-ceph-cluster
+    - name: cluster-apps-volsync
   path: ./kubernetes/apps/default/syncthing/app
   prune: true
   sourceRef:
