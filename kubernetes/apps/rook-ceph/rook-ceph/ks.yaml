@@ -19,7 +19,7 @@ spec:
   #     namespace: rook-ceph
   interval: 30m
   retryInterval: 1m
-  timeout: 3m
+  timeout: 5m
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -43,7 +43,7 @@ spec:
   #     namespace: rook-ceph
   interval: 30m
   retryInterval: 1m
-  timeout: 5m
+  timeout: 15m
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -59,11 +59,11 @@ spec:
   sourceRef:
     kind: GitRepository
     name: homelab
-  healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: rook-ceph-tools
-      namespace: rook-ceph
+  # healthChecks:
+  #   - apiVersion: apps/v1
+  #     kind: Deployment
+  #     name: rook-ceph-tools
+  #     namespace: rook-ceph
   interval: 30m
   retryInterval: 1m
   timeout: 5m
