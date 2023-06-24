@@ -62,7 +62,7 @@ spec:
     service:
       main:
         type: LoadBalancer
-        externalIPs: ${SECRET_K8S_GATEWAY}
+        externalIPs: "192.168.69.108" #${SECRET_K8S_GATEWAY}
         externalTrafficPolicy: Local
         ports:
           http:
