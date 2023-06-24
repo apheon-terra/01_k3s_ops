@@ -11,6 +11,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: homelab
+  wait: true
   # healthChecks:
   #   - apiVersion: helm.toolkit.fluxcd.io/v2beta1
   #     kind: HelmRelease
@@ -53,7 +54,7 @@ metadata:
 spec:
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
-  path: ./kubernetes/apps/rook-ceph/rook-ceph/toolbox
+  path: ./kubernetes/apps/rook-ceph/rook-ceph/addons
   prune: true
   sourceRef:
     kind: GitRepository
