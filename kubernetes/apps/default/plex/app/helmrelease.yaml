@@ -31,7 +31,7 @@ spec:
       type: statefulset
     image:
       repository: ghcr.io/onedr0p/plex
-      tag: 1.31.3.6868-28fc46b27@sha256:9bc113df99bb8255aa77e79be66d7558092d361592f9934299e1353bfacb32f4
+      tag: 1.32.4.7195-7c8f9d3b6@sha256:39c4ad71d92790d54b2d14be5fdabca940591ab2b9f8291d02653cd4f80d9d4f
     env:
       TZ: Etc/UTC
     service:
