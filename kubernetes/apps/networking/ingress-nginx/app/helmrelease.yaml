@@ -34,7 +34,7 @@ spec:
       service:
         annotations:
           external-dns.alpha.kubernetes.io/hostname: ingress.${SECRET_PUBLIC_DOMAIN}
-        externalIPs: ${SECRET_INGRESS_NGINX}
+        externalIPs: ["192.168.69.101"] #${SECRET_INGRESS_NGINX}
         externalTrafficPolicy: Local
       # publishService:
       #   enabled: true
