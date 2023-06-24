@@ -4,7 +4,13 @@ kind: Deployment
 metadata:
   name: rook-direct-mount
   labels:
-    app: rook-direct-mount
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rook-direct-mount
+    app.kubernetes.io/instance: rook-ceph-cluster
+    app.kubernetes.io/version: v1.0.0
+  annotations:
+    meta.helm.sh/release-name: rook-direct-mount
+    meta.helm.sh/release-namespace: rook-ceph
 spec:
   replicas: 1
   selector:

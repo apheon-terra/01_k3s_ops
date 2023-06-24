@@ -4,7 +4,13 @@ metadata:
   name: rook-ceph-tools
   namespace: rook-ceph # namespace:cluster
   labels:
-    app: rook-ceph-tools
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rook-ceph-tools
+    app.kubernetes.io/instance: rook-ceph-cluster
+    app.kubernetes.io/version: v1.0.0
+  annotations:
+    meta.helm.sh/release-name: rook-ceph-cluster
+    meta.helm.sh/release-namespace: rook-ceph
 spec:
   replicas: 1
   selector:
