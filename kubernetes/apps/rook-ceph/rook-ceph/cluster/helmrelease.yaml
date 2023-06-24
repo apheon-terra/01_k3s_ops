@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: rook-ceph-cluster
-      version: v1.11.2
+      version: v1.11.6
       sourceRef:
         kind: HelmRepository
         name: rook-ceph
@@ -77,6 +77,12 @@ spec:
             memory: 2678M
           limits:
             memory: 5944M
+        prepareosd:
+          requests:
+            cpu: "500m"
+            memory: "50Mi"
+          limits:
+            memory: "300Mi"
         mgr-sidecar:
           requests:
             cpu: 49m
@@ -115,13 +121,13 @@ spec:
         nodes:
           - name: agent-vm4
             devices:
-              - name: /dev/disk/by-id/usb-Realtek_RTL9210B-CG_012345679138-0:0
+              - name: /dev/sdb
           - name: agent-vm5
             devices:
-              - name: /dev/disk/by-id/scsi-1Realtek_RTL9210_NVME_1.000000000000000000
+              - name: /dev/sdb
           - name: agent-vm6
             devices:
-              - name: /dev/disk/by-id/usb-Realtek_RTL9210B-CG_012345679134-0:0
+              - name: /dev/sdb
     cephBlockPools:
       - name: ceph-blockpool
         spec:
@@ -199,7 +205,7 @@ spec:
                 cpu: 100m
                 memory: 128M
               limits:
-                memory: 2Gi
+                memory: 4Gi
             instances: 1
           healthCheck:
             bucket:
