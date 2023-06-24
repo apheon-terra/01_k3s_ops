@@ -46,6 +46,6 @@ spec:
             nodeSelector: all()
         multiInterfaceMode: None
         nodeAddressAutodetectionV4:
-          cidrs: [192.168.42.0/16]
+          cidrs: ["192.168.42.0/16"]
       nodeMetricsPort: 9091
       typhaMetricsPort: 9093

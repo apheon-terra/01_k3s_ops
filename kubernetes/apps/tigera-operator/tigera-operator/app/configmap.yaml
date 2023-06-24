@@ -7,5 +7,5 @@ metadata:
 data:
   # KUBERNETES_SERVICE_HOST: "192.168.254.3"
   # BOOTSTRAP_METALLB_INGRESS_ADDR is bellow
-  KUBERNETES_SERVICE_HOST: 192.168.1.1   #=>> the haproxy ip from router
+  KUBERNETES_SERVICE_HOST: "192.168.1.1"   #=>> the haproxy ip from router
   KUBERNETES_SERVICE_PORT: '6443'
