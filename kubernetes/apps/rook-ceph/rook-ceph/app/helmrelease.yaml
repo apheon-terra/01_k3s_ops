@@ -6,7 +6,8 @@ metadata:
   name: rook-ceph-operator
   namespace: rook-ceph
 spec:
-  interval: 15m
+  interval: 30m
+  timeout: 15m
   chart:
     spec:
       chart: rook-ceph
@@ -17,12 +18,12 @@ spec:
         namespace: flux-system
   maxHistory: 3
   install:
-    disableWait: true
+    # disableWait: true
     createNamespace: true
     remediation:
       retries: 3
   upgrade:
-    disableWait: true
+    # disableWait: true
     cleanupOnFail: true
     remediation:
       retries: 3
