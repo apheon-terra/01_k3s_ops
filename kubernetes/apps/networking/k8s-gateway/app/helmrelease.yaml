@@ -6,7 +6,8 @@ metadata:
   name: &app k8s-gateway
   namespace: networking
 spec:
-  interval: 15m
+  interval: 30m
+  timeout: 15m
   chart:
     spec:
       chart: app-template
