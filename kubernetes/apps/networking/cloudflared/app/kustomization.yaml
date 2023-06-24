@@ -10,5 +10,11 @@ configMapGenerator:
   - name: cloudflared-configmap
     files:
       - ./configs/config.yaml
+configurations:
+  - ./patches/kustomizeconfig.yaml
 generatorOptions:
   disableNameSuffixHash: true
+labels:
+  - pairs:
+      app.kubernetes.io/name: cloudflared
+      app.kubernetes.io/instance: cloudflared
