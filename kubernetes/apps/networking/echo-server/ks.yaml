@@ -10,11 +10,12 @@ spec:
   sourceRef:
     kind: GitRepository
     name: homelab
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      name: echo-server
-      namespace: default
+  # healthChecks:
+  #   - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+  #     kind: HelmRelease
+  #     name: echo-server
+  #     namespace: networking
+  wait: false
   interval: 30m
   retryInterval: 1m
   timeout: 3m
