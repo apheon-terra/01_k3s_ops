@@ -11,7 +11,8 @@ metadata:
     meta.helm.sh/release-name: tigera-operator
     meta.helm.sh/release-namespace: tigera-operator
 spec:
-  interval: 15m
+  interval: 30m
+  timeout: 15m
   chart:
     spec:
       chart: tigera-operator
