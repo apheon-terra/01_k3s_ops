@@ -70,7 +70,7 @@ spec:
           nginx.ingress.kubernetes.io/auth-snippet: proxy_set_header X-Forwarded-Method $request_method;
           hajimari.io/icon: mdi:music
         hosts:
-          - host: &host '{{ .Release.Name }}.alpheon.uk'
+          - host: &host navidrome.${SECRET_PUBLIC_DOMAIN}
             paths:
               - path: /
                 pathType: Prefix

@@ -12,21 +12,21 @@ spec:
           image: ghcr.io/onedr0p/postgres-init:14.8
           imagePullPolicy: IfNotPresent
           env:
-            - name: POSTGRES_HOST
+            - name: INIT_POSTGRES_HOST
               value: postgres-rw.default.svc.cluster.local
-            - name: POSTGRES_DB
+            - name: INIT_POSTGRES_DBNAME
               value: nextcloud
-            - name: POSTGRES_SUPER_PASS
+            - name: INIT_POSTGRES_SUPER_PASS
               valueFrom:
                 secretKeyRef:
                   name: nextcloud
                   key: POSTGRES_SUPER_PASS
-            - name: POSTGRES_USER
+            - name: INIT_POSTGRES_USER
               valueFrom:
                 secretKeyRef:
                   name: nextcloud
                   key: database-username
-            - name: POSTGRES_PASS
+            - name: INIT_POSTGRES_PASS
               valueFrom:
                 secretKeyRef:
                   name: nextcloud

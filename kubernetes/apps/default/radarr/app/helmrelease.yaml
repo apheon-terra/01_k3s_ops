@@ -37,10 +37,10 @@ spec:
     env:
       TZ: Etc/UTC
       PUSHOVER_DEBUG: 'false'
-      PUSHOVER_APP_URL: &host '{{ .Release.Name }}.alpheon.uk'
+      PUSHOVER_APP_URL: &host 'radarr.alpheon.uk'
       RADARR__INSTANCE_NAME: Radarr
       RADARR__PORT: &port 80
-      RADARR__APPLICATION_URL: https://{{ .Release.Name }}.alpheon.uk
+      RADARR__APPLICATION_URL: https://radarr.alpheon.uk
       RADARR__LOG_LEVEL: info
     envFrom:
       - secretRef:

@@ -84,7 +84,7 @@ spec:
       media:
         enabled: true
         type: nfs
-        server: ${expanse.${SECRET_DOMAIN}}
+        server: expanse.${SECRET_DOMAIN}
         path: /eros/Media
         mountPath: /media
         readOnly: true

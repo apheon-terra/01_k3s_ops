@@ -6,7 +6,7 @@ metadata:
   name: cluster-apps-matrix-element
   namespace: flux-system
 spec:
-  dependsOn:
+  # dependsOn:
   # - name: cluster-apps-external-secrets-stores
   # - name: cluster-apps-rook-ceph-cluster
   # - name: cluster-apps-volsync
@@ -22,4 +22,4 @@ spec:
       namespace: default
   interval: 30m
   retryInterval: 1m
-  timeout: 3m
+  timeout: 5m

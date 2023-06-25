@@ -99,7 +99,7 @@ spec:
       oidc:
         enabled: true
         display_name: authelia
-        issuer: https://auth.${SECRET_DOMAIN}
+        issuer: https://auth.${SECRET_PUBLIC_DOMAIN}
         discovery: true
         scope: openid,profile,email
         uid_field: preferred_username

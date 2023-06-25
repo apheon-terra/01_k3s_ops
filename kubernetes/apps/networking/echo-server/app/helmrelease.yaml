@@ -60,7 +60,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: "ingress.${SECRET_PUBLIC_DOMAIN}"
           hajimari.io/icon: mdi:video-input-antenna
         hosts:
-          - host: &host '{{ .Release.Name }}.${SECRET_PUBLIC_DOMAIN}'
+          - host: &host 'echo-server.${SECRET_PUBLIC_DOMAIN}'
             paths:
               - path: /
                 pathType: Prefix

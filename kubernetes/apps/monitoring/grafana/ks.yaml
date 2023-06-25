@@ -21,7 +21,7 @@ spec:
       namespace: monitoring
   interval: 30m
   retryInterval: 1m
-  timeout: 3m
+  timeout: 15m
 
 
 # The naming conventions for resources are typically determined by the organization or project's naming conventions and

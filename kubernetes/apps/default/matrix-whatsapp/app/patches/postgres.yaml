@@ -10,27 +10,27 @@ spec:
       init-db:
         image: ghcr.io/onedr0p/postgres-init:14.8
         env:
-          - name: POSTGRES_HOST
+          - name: INIT_POSTGRES_HOST
             valueFrom:
               secretKeyRef:
                 name: *app
                 key: MAUTRIX_WHATSAPP_POSTGRES_HOST
-          - name: POSTGRES_DB
+          - name: INIT_POSTGRES_DBNAME
             valueFrom:
               secretKeyRef:
                 name: *app
                 key: MAUTRIX_WHATSAPP_POSTGRES_DATABASE
-          - name: POSTGRES_SUPER_PASS
+          - name: INIT_POSTGRES_SUPER_PASS
             valueFrom:
               secretKeyRef:
                 name: *app
                 key: POSTGRES_SUPER_PASS
-          - name: POSTGRES_USER
+          - name: INIT_POSTGRES_USER
             valueFrom:
               secretKeyRef:
                 name: *app
                 key: MAUTRIX_WHATSAPP_POSTGRES_USERNAME
-          - name: POSTGRES_PASS
+          - name: INIT_POSTGRES_PASS
             valueFrom:
               secretKeyRef:
                 name: *app

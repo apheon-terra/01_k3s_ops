@@ -48,7 +48,7 @@ spec:
           nginx.ingress.kubernetes.io/backend-protocol: HTTPS
           hajimari.io/icon: mdi:plex
         hosts:
-          - host: &host '{{ .Release.Name }}.${SECRET_PUBLIC_DOMAIN}'
+          - host: &host 'plex.${SECRET_PUBLIC_DOMAIN}'
             paths:
               - path: /
                 pathType: Prefix
