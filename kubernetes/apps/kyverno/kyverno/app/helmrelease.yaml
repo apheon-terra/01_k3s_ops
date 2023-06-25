@@ -1,0 +1,59 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kyverno
+  namespace: kyverno
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: kyverno
+      version: 3.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: kyverno
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    crds:
+      install: true
+    replicaCount: 3
+    grafana:
+      enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 1m
+    backgroundController:
+      serviceMonitor:
+        enabled: true
+        interval: 1m
+    cleanupController:
+      serviceMonitor:
+        enabled: true
+        interval: 1m
+    reportsController:
+      serviceMonitor:
+        enabled: true
+        interval: 1m
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: kyverno
+
+# The Admission Controller is responsible for validating resources as they are created or modified, and it enforces Kyverno policies by rejecting non-compliant
+#  resources. The Background Controller is responsible for enforcing policies in the background, continuously monitoring resources and applying policies as necessary

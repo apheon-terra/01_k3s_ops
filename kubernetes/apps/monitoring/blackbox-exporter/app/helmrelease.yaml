@@ -1,0 +1,110 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app blackbox-exporter
+  namespace: monitoring
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: prometheus-blackbox-exporter
+      version: 7.10.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    fullnameOverride: *app
+    image:
+      repository: quay.io/prometheus/blackbox-exporter
+    pspEnabled: false
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        hajimari.io/enable: 'false'
+      hosts:
+        - host: &host blackbox.${SECRET_PUBLIC_DOMAIN}
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - *host
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        add: [NET_RAW]
+    config:
+      modules:
+        http_2xx:
+          prober: http
+          timeout: 5s
+          http:
+            valid_http_versions: [HTTP/1.1, HTTP/2.0]
+            follow_redirects: true
+            preferred_ip_protocol: ip4
+        icmp:
+          prober: icmp
+          timeout: 30s
+          icmp:
+            preferred_ip_protocol: ip4
+    serviceMonitor:
+      enabled: true
+      defaults:
+        labels:
+          release: prometheus
+        interval: 5m
+        scrapeTimeout: 30s
+      targets:
+      # Devices
+      # - {name: apc-ups-0-icmp, module: icmp, url: "${apc-ups-0-icmp}" }
+      # - {name: dell-idrac-0-icmp, module: icmp, url: dell-idrac-0}
+        - {name: expanse-icmp, module: icmp, url: '${SECRET_NFS_STORAGE}'}
+        - {name: c6u-openwrt, module: icmp, url: '${SECRET_C6U_OPENWRT}'}
+        - {name: c5-openwrt, module: icmp, url: '${SECRET_C5_OPENWRT}'}
+
+
+      # - {name: hdhomerun-icmp, module: icmp, url: hdhomerun}
+      # - {name: hue-bridge-icmp, module: icmp, url: hue-bridge}
+      # - {name: open-garage-icmp, module: icmp, url: open-garage}
+      # - {name: pikvm-icmp, module: icmp, url: pikvm}
+      # - {name: unifi-protect-icmp, module: icmp, url: unifi-protect}
+      # - {name: valetudo-icmp, module: icmp, url: valetudo}
+      # - {name: vyos-icmp, module: icmp, url: vyos}
+      # - {name: zigbee-controller-icmp, module: icmp, url: zigbee-controller}
+    prometheusRule:
+      enabled: true
+      additionalLabels:
+        app: prometheus-operator
+        release: prometheus
+      rules:
+        - alert: BlackboxProbeFailed
+          expr: probe_success == 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            description: |-
+              The host {{"{{ $labels.target }}"}} is currently unreachable
+        - alert: SlowResponseTime
+          annotations:
+            message: The response time for {{"{{ $labels.target }}"}} has been greater than 30 seconds for 5 minutes.
+          expr: probe_duration_seconds > 30
+          for: 5m
+          labels:
+            severity: warning

@@ -1,0 +1,95 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: syncthing
+  namespace: default
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    image:
+      repository: syncthing/syncthing
+      tag: 1.23.5
+    service:
+      main:
+        ports:
+          http:
+            port: 8384
+      listen:
+        type: LoadBalancer
+        externalIPs:
+          - ${SVC_SYNCTHING_ADDR}
+        loadBalancerIP: ${SVC_SYNCTHING_ADDR}
+        externalTrafficPolicy: Local
+        ports:
+          listen:
+            enabled: true
+            port: 22000
+            protocol: TCP
+            targetPort: 22000
+      discovery:
+        type: LoadBalancer
+        externalIPs:
+          - ${SVC_SYNCTHING_ADDR}
+        loadBalancerIP: ${SVC_SYNCTHING_ADDR}
+        externalTrafficPolicy: Local
+        ports:
+          discovery:
+            enabled: true
+            port: 21027
+            protocol: UDP
+            targetPort: 21027
+    ingress:
+      main:
+        enabled: true
+        primary: true
+        ingressClassName: nginx
+        annotations:
+          external-dns.alpha.kubernetes.io/target: ingress.${SECRET_PUBLIC_DOMAIN}
+          hajimari.io/icon: mdi:eye-circle
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+          # external-dns.alpha.kubernetes.io/target: "${SECRET_CLOUDFLARE_TUNNEL_ID}.cfargotunnel.com"
+        hosts:
+          - host: &host '{{ .Release.Name }}.${SECRET_PUBLIC_DOMAIN}'
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      data:
+        enabled: true
+        mountPath: /var/syncthing
+        existingClaim: syncthing-data-0
+    resources:
+      requests:
+        cpu: 15m
+        memory: 64M
+      limits:
+        memory: 512Mi
+
+#  template string that includes the name of the Helm release and a variable named SECRET_DOMAIN_INTERNAL.
+#   The SECRET_DOMAIN_INTERNAL variable will be resolved to a value during installation of the chart.
+#   The double quotes are used to denote a string value.

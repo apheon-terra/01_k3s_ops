@@ -1,0 +1,170 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: thanos
+  namespace: monitoring
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: thanos
+      version: 12.8.3
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    image:
+      registry: quay.io
+      repository: thanos/thanos
+      tag: v0.31.0
+    objstoreConfig:
+      type: s3
+      config:
+        insecure: true
+    queryFrontend:
+      enabled: true
+      replicaCount: 3
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          hajimari.io/enable: 'false'
+        hostname: &host thanos-query-frontend.${SECRET_PUBLIC_DOMAIN}
+        tls: true
+        extraTls:
+          - hosts:
+              - *host
+    query:
+      enabled: true
+      replicaCount: 3
+      replicaLabel: [__replica__]
+      dnsDiscovery:
+        sidecarsService: kube-prometheus-stack-thanos-discovery
+        sidecarsNamespace: monitoring
+    bucketweb:
+      enabled: true
+      replicaCount: 3
+    compactor:
+      enabled: true
+      extraFlags:
+        - --compact.concurrency=4
+        - --delete-delay=30m
+      retentionResolutionRaw: 14d
+      retentionResolution5m: 14d
+      retentionResolution1h: 14d
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 15Gi
+    storegateway:
+      enabled: true
+      replicaCount: 3
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 15Gi
+    ruler:
+      enabled: true
+      replicaCount: 3
+      replicaLabel: __replica__
+      alertmanagers: [http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093]
+      extraFlags: [--web.prefix-header=X-Forwarded-Prefix]
+      config: |-
+        groups:
+          - name: PrometheusWatcher
+            rules:
+              - alert: PrometheusDown
+                annotations:
+                  summary: A Prometheus has disappeared from Prometheus target discovery
+                expr: absent(up{job="kube-prometheus-stack-prometheus"})
+                for: 5m
+                labels:
+                  severity: critical
+          - name: thanos-all
+            rules:
+            - alert: ThanosSidecarPrometheusDown
+              annotations:
+                description: Thanos Sidecar {{$labels.instance}} cannot connect to Prometheus.
+                runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanossidecarprometheusdown
+                summary: Thanos Sidecar cannot connect to Prometheus
+              expr: |
+                thanos_sidecar_prometheus_up{job=~".*thanos-sidecar.*"} == 0
+              for: 5m
+              labels:
+                severity: critical
+            - alert: ThanosSidecarBucketOperationsFailed
+              annotations:
+                description: Thanos Sidecar {{$labels.instance}} bucket operations are failing
+                runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanossidecarbucketoperationsfailed
+                summary: Thanos Sidecar bucket operations are failing
+              expr: |
+                sum by (job, instance) (rate(thanos_objstore_bucket_operation_failures_total{job=~".*thanos-sidecar.*"}[5m])) > 0
+              for: 5m
+              labels:
+                severity: critical
+            - alert: ThanosSidecarUnhealthy
+              annotations:
+                description: Thanos Sidecar {{$labels.instance}} is unhealthy for more than {{$value}} seconds.
+                runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanossidecarunhealthy
+                summary: Thanos Sidecar is unhealthy.
+              expr: |
+                time() - max by (job, instance) (thanos_sidecar_last_heartbeat_success_time_seconds{job=~".*thanos-sidecar.*"}) >= 240
+              for: 5m
+              labels:
+                severity: critical
+            - alert: ThanosSidecarIsDown
+              annotations:
+                description: ThanosSidecar has disappeared. Prometheus target for the component cannot be discovered.
+                runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanossidecarisdown
+                summary: Thanos component has disappeared.
+              expr: |
+                thanos_sidecar_prometheus_up{job=~".*thanos-sidecar.*"} == 0
+              for: 5m
+              labels:
+                severity: critical
+
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 15Gi
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  valuesFrom:
+    - targetPath: objstoreConfig.config.bucket
+      kind: ConfigMap
+      name: thanos-bucket-v1
+      valuesKey: BUCKET_NAME
+    - targetPath: objstoreConfig.config.endpoint
+      kind: ConfigMap
+      name: thanos-bucket-v1
+      valuesKey: BUCKET_HOST
+    - targetPath: objstoreConfig.config.region
+      kind: ConfigMap
+      name: thanos-bucket-v1
+      valuesKey: BUCKET_REGION
+    - targetPath: objstoreConfig.config.access_key
+      kind: Secret
+      name: thanos-secret
+      valuesKey: AWS_ACCESS_KEY_ID
+    - targetPath: objstoreConfig.config.secret_key
+      kind: Secret
+      name: thanos-secret
+      valuesKey: AWS_SECRET_ACCESS_KEY

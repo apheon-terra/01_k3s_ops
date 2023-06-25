@@ -1,0 +1,56 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app matrix-synapse-admin
+  namespace: default
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    global:
+      nameOverride: *app
+
+    image:
+      repository: awesometechnologies/synapse-admin
+      tag: latest
+
+    service:
+      main:
+        ports:
+          http:
+            port: 80
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          external-dns.home.arpa/enabled: 'true'
+          # external-dns.alpha.kubernetes.io/target: "ingress.${SECRET_PUBLIC_DOMAIN}"
+
+          kubernetes.io/tls-acme: 'true'
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - host: synapse-admin.${SECRET_PUBLIC_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: tls.matrix-admin
+            hosts:
+              - synapse-admin.${SECRET_PUBLIC_DOMAIN}

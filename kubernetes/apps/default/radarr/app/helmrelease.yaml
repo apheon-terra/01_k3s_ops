@@ -1,0 +1,156 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: radarr
+  namespace: default
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: 'true'
+    image:
+      repository: ghcr.io/onedr0p/radarr-develop
+      tag: 4.6.2.7490@sha256:689342f7dfe06d7403d59097cab2f688639108de2e555cf532f7255fe84d51b5
+    env:
+      TZ: Etc/UTC
+      PUSHOVER_DEBUG: 'false'
+      PUSHOVER_APP_URL: &host '{{ .Release.Name }}.alpheon.uk'
+      RADARR__INSTANCE_NAME: Radarr
+      RADARR__PORT: &port 80
+      RADARR__APPLICATION_URL: https://{{ .Release.Name }}.alpheon.uk
+      RADARR__LOG_LEVEL: info
+    envFrom:
+      - secretRef:
+          name: radarr-secret
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+    probes:
+      liveness: &probes
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /ping
+            port: *port
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+      readiness: *probes
+      startup:
+        enabled: false
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${SECRET_PUBLIC_DOMAIN}/css/base/radarr/nord.css"></head>';
+            sub_filter_once on;
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          hajimari.io/icon: mdi:filmstrip
+        hosts:
+          - host: *host
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups: [10000]
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: ceph-block
+    persistence:
+      media:
+        enabled: true
+        type: nfs
+        server: expanse.{SECRET_DOMAIN}
+        path: /eros/Media #eros is the zfs pool name
+        mountPath: /media
+      scripts:
+        enabled: true
+        type: configMap
+        name: radarr-configmap
+        subPath: pushover-notify.sh
+        mountPath: /scripts/pushover-notify.sh
+        defaultMode: 0775
+        readOnly: true
+
+      # config:
+      #   enabled: true
+      #   existingClaim: radarr-config-0
+      # media:
+      #   enabled: true
+      #   existingClaim: media-nfs
+      #   mountPath: /media
+      # media-canfail:
+      #   enabled: true
+      #   existingClaim: media-nfs-canfail
+      #   mountPath: /media-canfail
+      # backup:
+      #   enabled: true
+      #   type: custom
+      #   volumeSpec:
+      #     nfs:
+      #       server: "${TRUENAS_VM_ADDRESS}"
+      #       path: /mnt/tank/backups/softwarrself/radarr
+      #   mountPath: /config/Backups
+      #   readOnly: false
+    resources:
+      requests:
+        cpu: 10m
+        memory: 250Mi
+      limits:
+        memory: 750Mi
+    metrics:
+      enabled: true
+      serviceMonitor:
+        interval: 3m
+        scrapeTimeout: 1m
+      prometheusRule:
+        enabled: true
+      exporter:
+        image:
+          repository: ghcr.io/onedr0p/exportarr
+          tag: v1.5.3
+        env:
+          port: 9794
+          additionalMetrics: true
+          unknownQueueItems: true

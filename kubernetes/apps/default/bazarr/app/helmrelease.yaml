@@ -1,0 +1,126 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: bazarr
+  namespace: default
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync
+  values:
+    initContainers:
+      01-init-db:
+        image: ghcr.io/onedr0p/postgres-initdb:14.8
+        imagePullPolicy: IfNotPresent
+        envFrom: &envFrom
+          - secretRef:
+              name: bazarr-secret
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: 'true'
+    image:
+      repository: ghcr.io/onedr0p/bazarr
+      tag: 1.2.1@sha256:ec73f87c96b7480273775d0f0541a58f2c1ead58c675be3effac0a4e9021256f
+    env:
+      TZ: Etc/UTC
+    # Bazarr does not support setting env for postgres settings
+    envFrom: *envFrom
+    service:
+      main:
+        ports:
+          http:
+            port: 6767
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.alpheon.uk/css/base/bazarr/nord.css"></head>';
+            sub_filter_once on;
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          hajimari.io/icon: mdi:subtitles-outline
+        hosts:
+          - host: &host '{{ .Release.Name }}.${SECRET_PUBLIC_DOMAIN}'
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups: [10000]
+    volumeClaimTemplates:
+      - name: config
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
+    persistence:
+      media:
+        enabled: true
+        type: nfs
+        server: expanse.${SECRET_DOMAIN}
+        path: /eros/Media
+        mountPath: /media
+      add-ons:
+        enabled: true
+        type: emptyDir
+        mountPath: /add-ons
+    resources:
+      requests:
+        cpu: 10m
+        memory: 250Mi
+      limits:
+        memory: 2000Mi
+    sidecars:
+      subcleaner:
+        image: registry.k8s.io/git-sync/git-sync:v3.6.7
+        imagePullPolicy: IfNotPresent
+        args:
+          - --repo=https://github.com/KBlixt/subcleaner.git
+          - --branch=master
+          - --depth=1
+          - --wait=86400 # 1 day
+          - --root=/add-ons/subcleaner
+        volumeMounts:
+          - {name: add-ons, mountPath: /add-ons}
+
+
+# Subcleaner is an add-on that can be used with the media server software Plex. It automatically cleans up
+# your Plex library by removing subtitles that are no longer needed, thereby saving disk space. The add-on
+# uses a tool called subliminal to identify which subtitle files are associated with each video file in your
+# library, and then removes any subtitle files that are not needed. The sidecar container in the Kubernetes
+# YAML you provided is used to synchronize the code of the subcleaner add-on from its Github repository to
+# the Kubernetes cluster and mount it in the add-ons volume, so that the main container can use it.

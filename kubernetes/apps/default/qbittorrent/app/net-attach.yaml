@@ -1,0 +1,12 @@
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: qbt-static
+  namespace: media
+spec:
+  config: '{ "cniVersion": "0.3.1", "type": "macvlan", "master": "eth0", "mode": "bridge", "ipam": { "type": "static", "addresses": [ { "address": "192.168.1.1/16"
+    } ] } }'
+    #for him
+#SVC_QBITTORRENT_ADDR: "10.250.14.110"  # needs port-forward
+#             "address": "10.250.6.110/20"

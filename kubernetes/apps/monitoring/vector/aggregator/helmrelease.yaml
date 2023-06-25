@@ -1,0 +1,107 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app vector-aggregator
+  namespace: monitoring
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    initContainers:
+      01-init-geoip:
+        image: ghcr.io/maxmind/geoipupdate:v5.1.1
+        imagePullPolicy: IfNotPresent
+        env:
+          - {name: GEOIPUPDATE_EDITION_IDS, value: GeoLite2-City}
+          - {name: GEOIPUPDATE_FREQUENCY, value: '0'}
+          - {name: GEOIPUPDATE_VERBOSE, value: 'true'}
+        envFrom:
+          - secretRef:
+              name: vector-aggregator-secret
+        volumeMounts:
+          - {name: geoip, mountPath: /usr/share/GeoIP}
+    controller:
+      replicas: 3
+      strategy: RollingUpdate
+      annotations:
+        reloader.stakater.com/auto: 'true'
+    image:
+      # https://github.com/vectordotdev/vector/issues/6715
+      repository: ghcr.io/onedr0p/vector
+      tag: 0.30.0-debian
+    args: [--config, /etc/vector/vector.yaml]
+    service:
+      main:
+        type: LoadBalancer
+        annotations:
+          coredns.io/hostname: vector.${SECRET_PUBLIC_DOMAIN}
+        externalIPs: ${SECRET_VECTOR_AGREGATOR}
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            port: 8686
+          journald:
+            enabled: true
+            port: 6000
+          kubernetes:
+            enabled: true
+            port: 6010
+          openwrt:
+            enabled: true
+            port: 6020
+            # protocol: UDP
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: vector-aggregator-configmap # overriden by kustomizeconfig
+        subPath: vector.yaml
+        mountPath: /etc/vector/vector.yaml
+        readOnly: true
+      data:
+        enabled: true
+        type: emptyDir
+        mountPath: /vector-data-dir
+      geoip:
+        enabled: true
+        type: emptyDir
+        mountPath: /usr/share/GeoIP
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: *app
+
+    # maxSkew describes the degree to which Pods may be unevenly distributed. You must specify this
+    # field and the number must be greater than zero. Its semantics differ according to the value of
+    # whenUnsatisfiable:
+    # if you select whenUnsatisfiable: DoNotSchedule, then maxSkew defines the maximum permitted
+    # difference between the number of matching pods in the target topology and the global minimum (the
+    # minimum number of matching pods in an eligible domain or zero if the number of eligible domains is
+    # less than MinDomains). For example, if you have 3 zones with 2, 2 and 1 matching pods respectively,
+    # MaxSkew is set to 1 then the global minimum is 1.
+
+    # if you select whenUnsatisfiable: ScheduleAnyway, the scheduler gives higher precedence to
+    # topologies that would help reduce the skew.
