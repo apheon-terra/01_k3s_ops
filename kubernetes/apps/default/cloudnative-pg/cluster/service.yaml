@@ -5,7 +5,7 @@ metadata:
   name: postgres-lb
   namespace: default
   annotations:
-    coredns.io/hostname: postgres.${SECRET_PUBLIC_DOMAIN}
+    coredns.io/hostname: "postgres.${SECRET_PUBLIC_DOMAIN}"
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local

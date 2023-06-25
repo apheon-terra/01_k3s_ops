@@ -54,7 +54,7 @@ spec:
       frontend:
         theme: tectonic
         issuer: alpheon
-        issuerUrl: https://${SECRET_PUBLIC_DOMAIN}
+        issuerUrl: "https://${SECRET_PUBLIC_DOMAIN}"
         logoUrl: http://icons.iconarchive.com/icons/icons-land/metro-halloween/512/Cool-icon.png
 
       expiry:
@@ -79,9 +79,9 @@ spec:
           id: github
           name: GitHub
           config:
-            clientID: ${SECRET_DEX_GITHUB_CLIENT_ID}
-            clientSecret: ${SECRET_DEX_GITHUB_CLIENT_SECRET}
-            redirectURI: https://dex.${SECRET_PUBLIC_DOMAIN}/callback
+            clientID: "${SECRET_DEX_GITHUB_CLIENT_ID}"
+            clientSecret: "${SECRET_DEX_GITHUB_CLIENT_SECRET}"
+            redirectURI: "https://dex.${SECRET_PUBLIC_DOMAIN}/callback"
           # 'orgs' can be used to map groups from Github
           # https://github.com/coreos/dex/blob/master/Documentation/connectors/github.md
             orgs:
@@ -90,9 +90,9 @@ spec:
       staticClients:
         - id: oauth2-proxy
           redirectURIs:
-            - https://oauth2.${SECRET_PUBLIC_DOMAIN}:4180/oauth2/callback
+            - "https://oauth2.${SECRET_PUBLIC_DOMAIN}:4180/oauth2/callback"
           name: oauth2-proxy
-          secret: ${AUTH0_GENERIC_CLIENT_SECRET}
+          secret: "${AUTH0_GENERIC_CLIENT_SECRET}"
 
       # - id: step
       #   name: step
