@@ -32,7 +32,7 @@ spec:
       strategy: RollingUpdate
     image:
       repository: ghcr.io/auricom/libreddit
-      tag: 0.30.1@sha256:a6ae0dffd43de4acdc221903d891fc5f768e7055e8b37b4e4195b37841cb1922
+      tag: 0.30.1@sha256:3da3f1f1ca2b3cd7dd01f57a65bed64e0bfefb49bfae028ea9ec5e701db3ff9c
     env:
       LIBREDDIT_DEFAULT_SHOW_NSFW: true
     service:
