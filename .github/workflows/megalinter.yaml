@@ -27,7 +27,7 @@ jobs:
           app_id: ${{ secrets.BOT_APP_ID }}
           private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
       - name: MegaLinter
-        uses: megalinter/megalinter/flavors/terraform@fda6ac3a38be0e969820709ac16e442464e5a035 # v7
+        uses: megalinter/megalinter/flavors/terraform@b48455a119cc28045eee8f1e9d0a542a85e71f4f # v7
         env:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
