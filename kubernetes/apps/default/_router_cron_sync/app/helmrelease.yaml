@@ -35,7 +35,7 @@ spec:
     restartPolicy: OnFailure
     image:
       repository: ghcr.io/onedr0p/alpine
-      tag: 3.18.2@sha256:4b666f73ee079b4feac9527fae3b0e60b0e9883213758bdb28af852c9acb4efe
+      tag: 3.19.1@sha256:3fbc581cb0fe29830376161ae026e2a765dcc11e1747477fe9ebf155720b8638
     command: [/bin/bash, /app/opnsense-backup.sh]
     env:
       OPNSENSE_URL: http://opnsense.${SECRET_DOMAIN}
