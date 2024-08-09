@@ -85,7 +85,7 @@ jobs:
           EOF
 
       - name: Publish schemas as web container
-        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
+        uses: docker/build-push-action@16ebe778df0e7752d2cfcbd924afdbbd89c1a755 # v6.6.1
         with:
           context: /home/runner/.datree/crdSchemas
           platforms: linux/amd64,linux/arm64
