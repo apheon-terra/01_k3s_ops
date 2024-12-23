@@ -12,7 +12,7 @@ collections:
   - name: kubernetes.core
     version: 2.4.0
   - name: devsec.hardening
-    version: 8.7.0
+    version: 10.2.0
 roles:
   - name: xanmanning.k3s
     src: https://github.com/PyratLabs/ansible-role-k3s.git
