@@ -2,7 +2,7 @@
 #from onedrop
 collections:
   - name: community.general
-    version: 7.1.0
+    version: 10.3.0
   - name: community.sops
     version: 1.6.4
   - name: ansible.posix
