@@ -16,7 +16,7 @@ terraform {
       version = "~> 3.4.0"
     }
     random = {
-      version = "~> 3.5.0"
+      version = "~> 3.6.0"
     }
     sops = {
       source  = "carlpett/sops"
