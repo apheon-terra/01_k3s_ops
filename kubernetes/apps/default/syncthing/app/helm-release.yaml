@@ -28,7 +28,7 @@ spec:
   values:
     image:
       repository: syncthing/syncthing
-      tag: 1.23.5
+      tag: 1.29.2
     service:
       main:
         ports:
