@@ -31,7 +31,7 @@ spec:
       type: statefulset
     image:
       repository: ghcr.io/wizarrrr/wizarr
-      tag: 2.2.0
+      tag: 4.2.0
     env:
       TZ: Etc/UTC
       APP_URL: https://wizarr.${SECRET_PUBLIC_DOMAIN}
