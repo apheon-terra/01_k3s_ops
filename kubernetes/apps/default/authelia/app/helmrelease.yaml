@@ -43,7 +43,7 @@ spec:
     image:
       repository: ghcr.io/authelia/authelia
       # TODO Switch to Authelia release tag on next release
-      tag: master@sha256:c1de28d7e4c508281154df39193b5a33e940a6b996c9881a9990db311a2cfc73
+      tag: master@sha256:59fac7802044c53bdf278ed41ed696130f57a71bfdf236394118a69505542632
     args: [--config, /config/configuration.yml, --config.experimental.filters, expand-env]
     env:
       AUTHELIA_AUTHENTICATION_BACKEND_LDAP_ADDITIONAL_USERS_DN: ou=users
