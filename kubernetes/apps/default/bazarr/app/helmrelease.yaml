@@ -45,7 +45,7 @@ spec:
         reloader.stakater.com/auto: 'true'
     image:
       repository: ghcr.io/onedr0p/bazarr
-      tag: 1.2.2@sha256:9656191a1347e44de7fc883912bb00d6a8d5c190dbd0dd77d5ba1ba075095b65
+      tag: v1.5.1@sha256:8605acf02f9fd3228a17eb83f1f69e4f10e70ba387017607c98e974aced6f79d
     env:
       TZ: Etc/UTC
     # Bazarr does not support setting env for postgres settings
