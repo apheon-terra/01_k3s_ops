@@ -27,7 +27,7 @@ spec:
 
     image:
       repository: dock.mau.dev/mautrix/signal
-      tag: v0.4.3
+      tag: v26.02.1
 
     service:
       main:
