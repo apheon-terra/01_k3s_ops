@@ -32,7 +32,7 @@ jobs:
           labels: |
             link-checker
       - name: Update Issue
-        uses: peter-evans/create-issue-from-file@433e51abf769039ee20ba1293a088ca19d573b7f # v4
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6
         with:
           title: Broken links detected in docs 🔗
           issue-number: ${{ steps.link-checker-issue.outputs.issue_number }}
