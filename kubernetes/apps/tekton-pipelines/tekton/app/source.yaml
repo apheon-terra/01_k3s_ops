@@ -25,7 +25,7 @@ spec:
     !/chains/previous/v0.16.0/release.yaml
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.alpheon.uk/kustomization_v1beta2.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: cluster-apps-tekton-source
