@@ -32,7 +32,7 @@ jobs:
             yq
 
       - name: Setup Flux
-        uses: fluxcd/flux2/action@dbda8fbdb8b58ed1ee69343025a6091eae0d1828 # v0.41.2
+        uses: fluxcd/flux2/action@3fa784edd773d56630bb9f62645e08f70c2cff0a # v2.10.0
 
       - name: Write kubeconfig
         id: kubeconfig
